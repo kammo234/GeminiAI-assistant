@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GeminiAI - Professional Chat Assistant</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Welcome Screen -->
+    <div class="welcome-screen" id="welcomeScreen">
+      <div class="welcome-content">
+        <div class="logo-container">
+          <i class="fas fa-robot logo-icon"></i>
+          <h1>GeminiAI</h1>
+        </div>
+        <p class="welcome-subtitle">Your Professional AI Assistant</p>
+        <p class="welcome-description">
+          Experience intelligent conversations with our advanced AI assistant. 
+          Get instant answers, assistance, or have productive conversations using text or voice.
+        </p>
+        <div class="welcome-actions">
+          <button id="startChatBtn" class="btn-primary">
+            <i class="fas fa-comments"></i> Start Chat
+          </button>
+          <button id="voiceDemoBtn" class="btn-secondary">
+            <i class="fas fa-microphone"></i> Voice Demo
+          </button>
+        </div>
+        <div class="feature-list">
+          <div class="feature-item">
+            <i class="fas fa-bolt"></i>
+            <span>Instant Responses</span>
+          </div>
+          <div class="feature-item">
+            <i class="fas fa-microphone-alt"></i>
+            <span>Voice Enabled</span>
+          </div>
+          <div class="feature-item">
+            <i class="fas fa-shield-alt"></i>
+            <span>Secure & Private</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat Interface -->
+    <div class="chat-interface hidden" id="chatInterface">
+      <div class="chat-header">
+        <div class="chat-title">
+          <i class="fas fa-robot"></i>
+          <div class="title-text">
+            <h2>GeminiAI Assistant</h2>
+            <span class="status">Online</span>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button id="clearChatBtn" class="icon-btn" title="Clear Chat">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+          <button id="minimizeBtn" class="icon-btn" title="Minimize">
+            <i class="fas fa-minus"></i>
+          </button>
+          <button id="closeChatBtn" class="icon-btn close" title="Close">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="chat-messages" id="chatMessages">
+        <div class="message-group bot">
+          <div class="message-avatar">
+            <i class="fas fa-robot"></i>
+          </div>
+          <div class="message-content">
+            <div class="message-bubble">
+              <p>Hello! I'm GeminiAI, your professional assistant powered by Google's Gemini AI. How can I help you today?</p>
+              <span class="message-time">Just now</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="typing-indicator hidden" id="typingIndicator">
+        <div class="typing-dots">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <p>GeminiAI is thinking...</p>
+      </div>
+
+      <div class="chat-input-container">
+        <div class="input-actions">
+          <button id="voiceInputBtn" class="icon-btn" title="Voice Input">
+            <i class="fas fa-microphone"></i>
+          </button>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" id="messageInput" placeholder="Type your message..." autocomplete="off" />
+          <button id="sendMessageBtn" class="send-btn" title="Send Message">
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Voice Recognition Indicator -->
+    <div class="voice-indicator hidden" id="voiceIndicator">
+      <div class="voice-modal">
+        <div class="voice-icon">
+          <i class="fas fa-microphone"></i>
+        </div>
+        <h3>Listening...</h3>
+        <p>Speak now. I'm listening to your voice.</p>
+        <div class="voice-animation">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <button id="cancelVoiceBtn" class="btn-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
