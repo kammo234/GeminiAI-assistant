@@ -1652,7 +1652,7 @@ flex:1;
 
 height:60px;
 
-padding:0 22px;
+padding:0 0 0 10px;
 
 border:none;
 
@@ -2004,7 +2004,7 @@ height:48px;
 
 .send-btn{
 
-width:56px;
+width:100%;
 
 }
 
