@@ -41,9 +41,8 @@ logger = logging.getLogger(__name__)
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 if not GOOGLE_API_KEY:
-    raise RuntimeError(
-        "GOOGLE_API_KEY not found in .env"
-    )
+    logger.error("GOOGLE_API_KEY environment variable is missing.")
+    raise RuntimeError("GOOGLE_API_KEY is not configured.")
 
 genai.configure(api_key=GOOGLE_API_KEY)
 
@@ -131,7 +130,7 @@ def chat():
 if __name__ == "__main__":
 
     app.run(
-        host="0.0.0.0",
-        port=5000,
-        debug=True
-    )
+    host="0.0.0.0",
+    port=int(os.environ.get("PORT", 5000)),
+    debug=False
+)
