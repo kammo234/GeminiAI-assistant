@@ -1,48 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GeminiAI - Professional Chat Assistant</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
   <div class="app-container">
     <!-- Welcome Screen -->
     <div class="welcome-screen" id="welcomeScreen">
       <div class="welcome-content">
+
+        <div class="hero-badge">
+          <i class="fas fa-sparkles"></i>
+          Powered by Gemini AI
+        </div>
+
         <div class="logo-container">
           <i class="fas fa-robot logo-icon"></i>
-          <h1>GeminiAI</h1>
         </div>
-        <p class="welcome-subtitle">Your Professional AI Assistant</p>
-        <p class="welcome-description">
-          Experience intelligent conversations with our advanced AI assistant. 
-          Get instant answers, assistance, or have productive conversations using text or voice.
+
+        <h1 class="hero-title">
+          Gemini<span>AI</span>
+        </h1>
+
+        <p class="welcome-subtitle">
+          Your Professional AI Assistant
         </p>
+
+        <p class="welcome-description">
+          Experience intelligent conversations with our advanced AI assistant.
+          Ask questions, generate ideas, solve problems, and work faster using
+          powerful AI.
+        </p>
+
         <div class="welcome-actions">
+
           <button id="startChatBtn" class="btn-primary">
-            <i class="fas fa-comments"></i> Start Chat
+            <i class="fas fa-comments"></i>
+            Start Chat
           </button>
+
           <button id="voiceDemoBtn" class="btn-secondary">
-            <i class="fas fa-microphone"></i> Voice Demo
+            <i class="fas fa-microphone"></i>
+            Voice Demo
           </button>
+
         </div>
+
         <div class="feature-list">
+
           <div class="feature-item">
+
             <i class="fas fa-bolt"></i>
-            <span>Instant Responses</span>
+
+            <h3>Fast Response</h3>
+
+            <p>
+              Get answers in seconds with advanced AI processing.
+            </p>
+
           </div>
+
           <div class="feature-item">
+
             <i class="fas fa-microphone-alt"></i>
-            <span>Voice Enabled</span>
+
+            <h3>Voice Enabled</h3>
+
+            <p>
+              Talk naturally using speech recognition.
+            </p>
+
           </div>
+
           <div class="feature-item">
+
             <i class="fas fa-shield-alt"></i>
-            <span>Secure & Private</span>
+
+            <h3>Secure & Private</h3>
+
+            <p>
+              Your conversations stay protected and secure.
+            </p>
+
           </div>
+
         </div>
+
       </div>
     </div>
 
@@ -76,7 +125,8 @@
           </div>
           <div class="message-content">
             <div class="message-bubble">
-              <p>Hello! I'm GeminiAI, your professional assistant powered by Google's Gemini AI. How can I help you today?</p>
+              <p>Hello! I'm GeminiAI, your professional assistant powered by Google's Gemini AI. How can I help you
+                today?</p>
               <span class="message-time">Just now</span>
             </div>
           </div>
@@ -129,4 +179,5 @@
 
   <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
+
 </html>

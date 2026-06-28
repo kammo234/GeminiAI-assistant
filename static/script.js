@@ -1,238 +1,569 @@
-// DOM Elements
-const welcomeScreen = document.getElementById('welcomeScreen');
-const chatInterface = document.getElementById('chatInterface');
-const startChatBtn = document.getElementById('startChatBtn');
-const voiceDemoBtn = document.getElementById('voiceDemoBtn');
-const closeChatBtn = document.getElementById('closeChatBtn');
-const minimizeBtn = document.getElementById('minimizeBtn');
-const clearChatBtn = document.getElementById('clearChatBtn');
-const chatMessages = document.getElementById('chatMessages');
-const messageInput = document.getElementById('messageInput');
-const sendMessageBtn = document.getElementById('sendMessageBtn');
-const voiceInputBtn = document.getElementById('voiceInputBtn');
-const typingIndicator = document.getElementById('typingIndicator');
-const voiceIndicator = document.getElementById('voiceIndicator');
-const cancelVoiceBtn = document.getElementById('cancelVoiceBtn');
+// ======================================================
+// GEMINIAI ASSISTANT
+// Production Version 2.0
+// Part 1 - Foundation
+// ======================================================
 
-// App State
-let isListening = false;
+class GeminiAssistant {
 
-// Initialize the app
-function initApp() {
+  constructor() {
+
+    // -----------------------------
+    // DOM Elements
+    // -----------------------------
+
+    this.welcomeScreen = document.getElementById("welcomeScreen");
+    this.chatInterface = document.getElementById("chatInterface");
+
+    this.startChatBtn = document.getElementById("startChatBtn");
+    this.voiceDemoBtn = document.getElementById("voiceDemoBtn");
+
+    this.closeChatBtn = document.getElementById("closeChatBtn");
+    this.minimizeBtn = document.getElementById("minimizeBtn");
+    this.clearChatBtn = document.getElementById("clearChatBtn");
+
+    this.chatMessages = document.getElementById("chatMessages");
+
+    this.messageInput = document.getElementById("messageInput");
+
+    this.sendMessageBtn = document.getElementById("sendMessageBtn");
+
+    this.voiceInputBtn = document.getElementById("voiceInputBtn");
+
+    this.typingIndicator = document.getElementById("typingIndicator");
+
+    this.voiceIndicator = document.getElementById("voiceIndicator");
+
+    this.cancelVoiceBtn = document.getElementById("cancelVoiceBtn");
+
+    // -----------------------------
+    // State
+    // -----------------------------
+
+    this.isListening = false;
+
+    this.isTyping = false;
+
+    this.currentSpeech = null;
+
+    this.typingSpeed = 18;
+
+    this.recognition = null;
+
+    this.supportsSpeech = false;
+
+    // -----------------------------
+    // Initialize
+    // -----------------------------
+
+    this.initializeSpeech();
+
+    this.registerEvents();
+
+  }
+
+  // ==================================================
+  // Speech Recognition
+  // ==================================================
+
+  initializeSpeech() {
+
+    const SpeechRecognition =
+      window.SpeechRecognition ||
+      window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+
+      console.warn("Speech Recognition not supported.");
+
+      this.supportsSpeech = false;
+
+      return;
+
+    }
+
+    this.supportsSpeech = true;
+
+    this.recognition = new SpeechRecognition();
+
+    this.recognition.lang = "en-IN";
+
+    this.recognition.interimResults = false;
+
+    this.recognition.maxAlternatives = 1;
+
+    this.recognition.continuous = false;
+
+  }
+
+  // ==================================================
   // Event Listeners
-  startChatBtn.addEventListener('click', openChat);
-  voiceDemoBtn.addEventListener('click', startVoiceDemo);
-  closeChatBtn.addEventListener('click', closeChat);
-  minimizeBtn.addEventListener('click', minimizeChat);
-  clearChatBtn.addEventListener('click', clearChat);
-  sendMessageBtn.addEventListener('click', sendMessage);
-  messageInput.addEventListener('keypress', handleKeyPress);
-  voiceInputBtn.addEventListener('click', toggleVoiceInput);
-  cancelVoiceBtn.addEventListener('click', cancelVoiceInput);
-}
+  // ==================================================
 
-// Open chat interface
-function openChat() {
-  welcomeScreen.classList.add('hidden');
-  chatInterface.classList.remove('hidden');
-  messageInput.focus();
-}
+  registerEvents() {
 
-// Close chat interface
-function closeChat() {
-  chatInterface.classList.add('hidden');
-  welcomeScreen.classList.remove('hidden');
-  clearChat();
-}
+    this.startChatBtn?.addEventListener(
+      "click",
+      () => this.openChat()
+    );
 
-// Minimize chat (placeholder functionality)
-function minimizeChat() {
-  // In a real app, this would minimize the chat window
-  alert('Minimize functionality would be implemented in a desktop app context');
-}
+    this.voiceDemoBtn?.addEventListener(
+      "click",
+      () => this.startListening()
+    );
 
-// Clear chat messages
-function clearChat() {
-  chatMessages.innerHTML = `
-    <div class="message-group bot">
-      <div class="message-avatar">
-        <i class="fas fa-robot"></i>
-      </div>
-      <div class="message-content">
-        <div class="message-bubble">
-          <p>Hello! I'm GeminiAI, your professional assistant powered by Google's Gemini AI. How can I help you today?</p>
-          <span class="message-time">Just now</span>
-        </div>
-      </div>
-    </div>
-  `;
-}
+    this.closeChatBtn?.addEventListener(
+      "click",
+      () => this.closeChat()
+    );
 
-// Handle key press in message input
-function handleKeyPress(e) {
-  if (e.key === 'Enter') {
-    sendMessage();
-  }
-}
+    this.clearChatBtn?.addEventListener(
+      "click",
+      () => this.clearChat()
+    );
 
-// Send message to Flask backend
-async function sendMessage() {
-  const message = messageInput.value.trim();
-  if (message === '') return;
-  
-  addMessage('user', message);
-  messageInput.value = '';
-  
-  // Show typing indicator
-  showTypingIndicator();
-  
-  try {
-    const response = await fetch('/chat', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ message: message })
-    });
-    
-    const data = await response.json();
-    hideTypingIndicator();
-    
-    if (response.ok) {
-      addMessage('bot', data.reply);
-    } else {
-      addMessage('bot', `Error: ${data.reply}`);
-    }
-  } catch (error) {
-    hideTypingIndicator();
-    addMessage('bot', 'Sorry, there was an error connecting to the AI service.');
-    console.error('Chat error:', error);
-  }
-}
+    this.sendMessageBtn?.addEventListener(
+      "click",
+      () => this.sendMessage()
+    );
 
-// Add message to chat
-function addMessage(sender, text) {
-  const messageGroup = document.createElement('div');
-  messageGroup.className = `message-group ${sender}`;
-  
-  const avatar = document.createElement('div');
-  avatar.className = 'message-avatar';
-  
-  const avatarIcon = document.createElement('i');
-  avatarIcon.className = sender === 'bot' ? 'fas fa-robot' : 'fas fa-user';
-  
-  avatar.appendChild(avatarIcon);
-  
-  const messageContent = document.createElement('div');
-  messageContent.className = 'message-content';
-  
-  const messageBubble = document.createElement('div');
-  messageBubble.className = 'message-bubble';
-  
-  const messageText = document.createElement('p');
-  messageText.textContent = text;
-  
-  const messageTime = document.createElement('span');
-  messageTime.className = 'message-time';
-  messageTime.textContent = getCurrentTime();
-  
-  messageBubble.appendChild(messageText);
-  messageBubble.appendChild(messageTime);
-  messageContent.appendChild(messageBubble);
-  
-  messageGroup.appendChild(avatar);
-  messageGroup.appendChild(messageContent);
-  
-  chatMessages.appendChild(messageGroup);
-  scrollToBottom();
-}
+    this.voiceInputBtn?.addEventListener(
+      "click",
+      () => this.startListening()
+    );
 
-// Show typing indicator
-function showTypingIndicator() {
-  typingIndicator.classList.remove('hidden');
-  scrollToBottom();
-}
+    this.cancelVoiceBtn?.addEventListener(
+      "click",
+      () => this.stopListening()
+    );
 
-// Hide typing indicator
-function hideTypingIndicator() {
-  typingIndicator.classList.add('hidden');
-}
+    this.messageInput?.addEventListener(
+      "keydown",
+      (e) => {
 
-// Get current time for message timestamp
-function getCurrentTime() {
-  const now = new Date();
-  return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
+        if (e.key === "Enter") {
 
-// Scroll to bottom of chat
-function scrollToBottom() {
-  chatMessages.scrollTop = chatMessages.scrollHeight;
-}
+          e.preventDefault();
 
-// Start voice demo
-function startVoiceDemo() {
-  if (!isListening) {
-    startVoiceInput();
-  }
-}
+          this.sendMessage();
 
-// Toggle voice input
-function toggleVoiceInput() {
-  if (isListening) {
-    cancelVoiceInput();
-  } else {
-    startVoiceInput();
-  }
-}
+        }
 
-// Start voice input
-async function startVoiceInput() {
-  voiceIndicator.classList.remove('hidden');
-  isListening = true;
-  
-  try {
-    const response = await fetch('/voice', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
       }
-    });
-    
-    const data = await response.json();
-    voiceIndicator.classList.add('hidden');
-    isListening = false;
-    
-    if (response.ok && data.user_input) {
-      // Add user's voice message
-      addMessage('user', data.user_input);
-      
-      // Show typing indicator for AI response
-      showTypingIndicator();
-      
-      // Add AI response from voice endpoint
-      setTimeout(() => {
-        hideTypingIndicator();
-        addMessage('bot', data.reply);
-      }, 1000);
-      
-    } else {
-      addMessage('bot', data.reply || 'Voice recognition failed.');
-    }
-  } catch (error) {
-    voiceIndicator.classList.add('hidden');
-    isListening = false;
-    addMessage('bot', 'Voice service unavailable. Please try again.');
-    console.error('Voice error:', error);
+    );
+
   }
+
+  // ==================================================
+  // Open Chat
+  // ==================================================
+
+  openChat() {
+
+    this.welcomeScreen.classList.add("hidden");
+
+    this.chatInterface.classList.remove("hidden");
+
+    this.messageInput.focus();
+
+  }
+
+  // ==================================================
+  // Close Chat
+  // ==================================================
+
+  closeChat() {
+
+    this.chatInterface.classList.add("hidden");
+
+    this.welcomeScreen.classList.remove("hidden");
+
+  }
+
+  // ==================================================
+  // Clear Chat
+  // ==================================================
+
+  clearChat() {
+
+    this.chatMessages.innerHTML = "";
+
+  }
+
+  // ==================================================
+  // Voice Placeholder
+  // ==================================================
+
+  startListening(){
+
+    if(!this.supportsSpeech){
+
+        alert("Speech Recognition not supported.");
+
+        return;
+
+    }
+
+    this.voiceIndicator.classList.remove("hidden");
+
+    this.isListening=true;
+
+    this.recognition.start();
+
+    this.recognition.onresult=(event)=>{
+
+        const transcript=
+            event.results[0][0].transcript;
+
+        this.voiceIndicator.classList.add("hidden");
+
+        this.isListening=false;
+
+        this.messageInput.value=transcript;
+
+        this.sendMessage();
+
+    };
+
+    this.recognition.onerror=()=>{
+
+        this.voiceIndicator.classList.add("hidden");
+
+        this.isListening=false;
+
+    };
+
+    this.recognition.onend=()=>{
+
+        this.voiceIndicator.classList.add("hidden");
+
+        this.isListening=false;
+
+    };
+
 }
 
-// Cancel voice input
-function cancelVoiceInput() {
-  voiceIndicator.classList.add('hidden');
-  isListening = false;
-  // Note: We can't actually cancel the server-side voice recognition
-  // once it's started, but we can hide the UI indicator
+  stopListening(){
+
+    if(this.recognition){
+
+        this.recognition.stop();
+
+    }
+
+    this.voiceIndicator.classList.add("hidden");
+
+    this.isListening=false;
+
 }
 
-// Initialize the app when DOM is loaded
-document.addEventListener('DOMContentLoaded', initApp);
+  // ==================================================
+  // Chat Placeholder
+  // ==================================================
+
+  // ==================================================
+  // Add Message
+  // ==================================================
+
+  addMessage(sender, text) {
+
+    const group = document.createElement("div");
+
+    group.className = `message-group ${sender}`;
+
+    const avatar = document.createElement("div");
+
+    avatar.className = "message-avatar";
+
+    avatar.innerHTML =
+      sender === "bot"
+        ? '<i class="fas fa-robot"></i>'
+        : '<i class="fas fa-user"></i>';
+
+    const content = document.createElement("div");
+
+    content.className = "message-content";
+
+    const bubble = document.createElement("div");
+
+    bubble.className = "message-bubble";
+
+    const p = document.createElement("p");
+
+    p.textContent = text;
+
+    const time = document.createElement("span");
+
+    time.className = "message-time";
+
+    time.textContent =
+      new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+
+    bubble.appendChild(p);
+
+    bubble.appendChild(time);
+
+    content.appendChild(bubble);
+
+    group.appendChild(avatar);
+
+    group.appendChild(content);
+
+    this.chatMessages.appendChild(group);
+
+    this.scrollBottom();
+
+
+
+  }
+
+
+
+  // ==================================================
+  // Typing
+  // ==================================================
+
+  showTyping() {
+
+    this.typingIndicator.classList.remove("hidden");
+
+    this.scrollBottom();
+
+  }
+
+  hideTyping() {
+
+    this.typingIndicator.classList.add("hidden");
+
+  }
+
+
+
+  // ==================================================
+  // Scroll
+  // ==================================================
+
+  scrollBottom() {
+
+    this.chatMessages.scrollTop =
+      this.chatMessages.scrollHeight;
+
+  }
+
+  // ==================================================
+  // Speak AI Response
+  // ==================================================
+
+  speak(text) {
+
+    if (!("speechSynthesis" in window)) {
+
+      return;
+
+    }
+
+    window.speechSynthesis.cancel();
+
+    const speech =
+      new SpeechSynthesisUtterance(text);
+
+    speech.lang = "en-US";
+
+    speech.rate = 1;
+
+    speech.pitch = 1;
+
+    speech.volume = 1;
+
+    this.currentSpeech = speech;
+
+    window.speechSynthesis.speak(speech);
+
+  }
+
+
+
+  // ==================================================
+  // Stop Speaking
+  // ==================================================
+
+  stopSpeaking() {
+
+    window.speechSynthesis.cancel();
+
+  }
+
+  // ==================================================
+// Type Writer Animation
+// ==================================================
+
+async typeBotMessage(text){
+
+    const group =
+        document.createElement("div");
+
+    group.className="message-group bot";
+
+    group.innerHTML=`
+
+    <div class="message-avatar">
+
+        <i class="fas fa-robot"></i>
+
+    </div>
+
+    <div class="message-content">
+
+        <div class="message-bubble">
+
+            <p></p>
+
+            <span class="message-time">
+
+                ${new Date().toLocaleTimeString([],{
+
+                    hour:"2-digit",
+
+                    minute:"2-digit"
+
+                })}
+
+            </span>
+
+        </div>
+
+    </div>
+
+    `;
+
+    this.chatMessages.appendChild(group);
+
+    const p =
+        group.querySelector("p");
+
+    for(let i=0;i<text.length;i++){
+
+        p.textContent += text[i];
+
+        this.scrollBottom();
+
+        await new Promise(resolve=>{
+
+            setTimeout(
+
+                resolve,
+
+                this.typingSpeed
+
+            );
+
+        });
+
+    }
+
+}
+
+  // ==================================================
+  // Send Message
+  // ==================================================
+
+  async sendMessage() {
+
+    const message =
+      this.messageInput.value.trim();
+
+    if (!message) {
+
+      return;
+
+    }
+
+    this.addMessage("user", message);
+
+    this.messageInput.value = "";
+
+    this.showTyping();
+
+    try {
+
+      const response =
+        await fetch("/chat", {
+
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+
+            message: message
+
+          })
+
+        });
+
+      const data =
+        await response.json();
+
+      this.hideTyping();
+
+      if (response.ok) {
+
+        await this.typeBotMessage(data.reply);;
+
+      }
+
+      else {
+
+        this.addMessage(
+
+          "bot",
+
+          data.error || "Something went wrong."
+
+        );
+
+      }
+
+    }
+
+    catch (error) {
+
+      this.hideTyping();
+
+      console.error(error);
+
+      this.addMessage(
+
+        "bot",
+
+        "Unable to connect to server."
+
+      );
+
+    }
+
+  }
+
+}
+
+// ======================================================
+// Start Application
+// ======================================================
+
+document.addEventListener(
+
+  "DOMContentLoaded",
+
+  () => {
+
+    new GeminiAssistant();
+
+  }
+
+);
+
